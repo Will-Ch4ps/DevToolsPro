@@ -76,6 +76,8 @@ export function getBundlerTemplate() {
           </div>
         </div>
 
+        <div id="tree-tools" class="tree-tools"></div>
+
         <div id="file-tree" class="file-tree-container">
           <div class="empty-state-icon">
             <span class="material-icons-round">inventory_2</span>

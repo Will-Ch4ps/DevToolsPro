@@ -4,6 +4,19 @@
  * Construção dos elementos DOM da árvore (funções puras, recebem o callback de check)
  */
 
+// Métrica exibida em destaque na árvore: 'lines' (padrão) | 'size'
+let DISPLAY_METRIC = 'lines';
+
+export function setDisplayMetric(metric) {
+  DISPLAY_METRIC = metric === 'size' ? 'size' : 'lines';
+}
+
+// Limiares de "peso" por métrica (para a cor suave)
+const THRESHOLDS = {
+  lines: { mid: 200, high: 500 },
+  size: { mid: 20 * 1024, high: 75 * 1024 }
+};
+
 export function buildNode(node, level, onCheck) {
   const row = document.createElement('div');
   row.className = 'tree-row';
@@ -26,9 +39,15 @@ export function buildNode(node, level, onCheck) {
 }
 
 function buildFolderNode(node, row, checkbox, level, onCheck) {
+  const val = metricValue(node, DISPLAY_METRIC);
+  const folderMeta = (val == null || val === 0)
+    ? ''
+    : `<span class="folder-meta">${formatMetric(DISPLAY_METRIC, val)}</span>`;
+
   row.innerHTML = `
         <span class="material-icons-round folder-icon">folder</span>
         <span class="folder-name">${escapeHtml(node.name)}</span>
+        ${folderMeta}
       `;
   row.prepend(checkbox);
 
@@ -54,6 +73,11 @@ function buildFolderNode(node, row, checkbox, level, onCheck) {
   wrapper.className = 'tree-folder-wrapper';
   wrapper.append(row, childrenDiv);
 
+  // refs para destaque/filtro de seleção
+  node._elRow = row;
+  node._elWrapper = wrapper;
+  node._elChildren = childrenDiv;
+
   if (Array.isArray(node.children) && node.children.length > 0) {
     node.children.forEach((child) => {
       childrenDiv.appendChild(buildNode(child, level + 1, onCheck));
@@ -67,9 +91,10 @@ function buildFileNode(node, row, checkbox) {
   row.innerHTML = `
         <span class="material-icons-round file-icon">description</span>
         <span class="file-name">${escapeHtml(node.name)}</span>
-        <span class="file-size">${formatBytes(node.size)}</span>
+        <span class="file-meta">${renderMetric(node, DISPLAY_METRIC)}</span>
       `;
   row.prepend(checkbox);
+  node._elRow = row;
 
   // Clicar na linha marca o checkbox
   row.onclick = (e) => {
@@ -77,6 +102,35 @@ function buildFileNode(node, row, checkbox) {
   };
 
   return row;
+}
+
+function renderMetric(node, metric) {
+  const val = metricValue(node, metric);
+  const cls = weightClass(metric, val);
+  const title = metric === 'lines' ? 'linhas' : 'tamanho';
+  return `<span class="file-metric primary ${cls}" title="${formatMetric(metric, val)} (${title})">
+            <span class="metric-dot"></span>${formatMetric(metric, val)}
+          </span>`;
+}
+
+function metricValue(node, metric) {
+  return metric === 'size' ? (node.size ?? null) : (node.lines ?? null);
+}
+
+function formatMetric(metric, value) {
+  if (value == null) return '—';
+  return metric === 'size' ? formatBytes(value) : `${formatNumber(value)} ln`;
+}
+
+/**
+ * Classe de "peso" por métrica (cor suave). Linhas: convenção de 200 saudável.
+ */
+function weightClass(metric, value) {
+  if (value == null) return 'weight-none';
+  const t = THRESHOLDS[metric] || THRESHOLDS.lines;
+  if (value > t.high) return 'weight-high';
+  if (value > t.mid) return 'weight-mid';
+  return 'weight-low';
 }
 
 function formatBytes(bytes) {
@@ -88,6 +142,10 @@ function formatBytes(bytes) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
   return `${parseFloat(value.toFixed(1))} ${units[i] || 'B'}`;
+}
+
+function formatNumber(n) {
+  return Number(n).toLocaleString('pt-BR');
 }
 
 /**

@@ -1,6 +1,6 @@
 // dev-tools-hub-pro/src/renderer/features/bundler/bundler.view.js
 
-import { FileTree, FilterBar, StatusPanel, SshModal } from './components/index.js';
+import { FileTree, FilterBar, TreeTools, StatusPanel, SshModal } from './components/index.js';
 import { getBundlerTemplate } from './bundler.view.template.js';
 import * as PromptsPanel from './bundler.view.prompts.js';
 import * as HeaderPanel from './bundler.view.header.js';
@@ -63,6 +63,16 @@ export const BundlerView = {
     FilterBar.render(
       this.elements.container.querySelector('#filter-bar'),
       (filter) => this.events.onFilter?.(filter)
+    );
+
+    TreeTools.render(
+      this.elements.container.querySelector('#tree-tools'),
+      {
+        onSort: (mode, dir) => this.events.onSort?.(mode, dir),
+        onDisplayMetric: (metric) => this.events.onDisplayMetric?.(metric),
+        onSelectByMetric: (opts) => this.events.onSelectByMetric?.(opts),
+        onShowSelectedOnly: (on) => this.events.onShowSelectedOnly?.(on)
+      }
     );
 
     StatusPanel.render(
@@ -136,8 +146,21 @@ export const BundlerView = {
     FileTree.showLoading(show);
   },
 
+  setDisplayMetric(metric) {
+    FileTree.setDisplayMetric(metric);
+  },
+
   updateStats(count, size) {
     StatusPanel.updateStats(count, size);
+    TreeTools.setSelectedCount(count);
+  },
+
+  revealSelected() {
+    FileTree.revealSelected();
+  },
+
+  showSelectedOnly(on) {
+    FileTree.applySelectedOnly(on);
   },
 
   setGenerating(loading) {

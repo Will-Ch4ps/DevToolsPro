@@ -1,0 +1,12 @@
+/* Ponto de entrada dos estilos — centraliza os módulos */
+
+@import './base.css';
+@import './layout.css';
+@import './bundler.css';
+@import './composer.css';
+@import './tree.css';
+@import './tree-tools.css';
+@import './modal.css';
+@import './ssh-modal.css';
+@import './ssh-form.css';
+@import './prompts.css';

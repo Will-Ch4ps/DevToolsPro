@@ -1,0 +1,172 @@
+/* Modal SSH — formulário manual, auth e browser de pastas */
+
+/* === SSH FORM === */
+
+.ssh-form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    font-size: 13px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent);
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.input-with-button input {
+    flex: 1;
+}
+
+.input-status {
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.input-status.success {
+    color: var(--success);
+}
+
+.input-status.error {
+    color: var(--danger);
+}
+
+/* === AUTH TOGGLE === */
+
+.auth-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.auth-btn {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 12px;
+}
+
+.auth-btn:hover {
+    border-color: var(--text-muted);
+}
+
+.auth-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+/* === SSH BROWSER === */
+
+.ssh-browser {
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+}
+
+.ssh-connected-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(35, 134, 54, 0.15);
+    border: 1px solid var(--success);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--success);
+}
+
+.ssh-quick-paths {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.quick-path-btn {
+    padding: 4px 10px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.quick-path-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.ssh-folder-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-root);
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: 0.15s;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.folder-item:last-child {
+    border-bottom: none;
+}
+
+.folder-item:hover {
+    background: var(--bg-hover);
+}
+
+.ssh-browser-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}

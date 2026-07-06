@@ -8,6 +8,29 @@ const os = require('os');
 
 // --- CONFIGURAÇÃO DE SEGURANÇA ---
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const LINE_COUNT_MAX_SIZE = 2 * 1024 * 1024; // 2MB: acima disso não contamos linhas (evita I/O pesado)
+
+/**
+ * Conta linhas de um arquivo de texto de forma barata (conta bytes 0x0A no buffer).
+ * Retorna null quando o arquivo é grande demais ou parece binário (tem byte nulo).
+ */
+async function countFileLines(filePath, size) {
+  if (size > LINE_COUNT_MAX_SIZE) return null;
+  if (size === 0) return 0;
+  try {
+    const buf = await fs.readFile(filePath);
+    if (buf.includes(0)) return null; // provável binário
+    let count = 0;
+    for (let i = 0; i < buf.length; i++) {
+      if (buf[i] === 10) count++; // '\n'
+    }
+    // se o arquivo não termina em newline, a última linha ainda conta
+    if (buf[buf.length - 1] !== 10) count++;
+    return count;
+  } catch {
+    return null;
+  }
+}
 
 const IGNORE_DIRS = new Set([
   'node_modules', '.git', '.svn', '.hg', '.vscode', '.idea', '.vs',
@@ -58,6 +81,7 @@ async function scanDirectory(dirPath) {
             path: fullPath,
             type: 'file',
             size: stats.size,
+            lines: await countFileLines(fullPath, stats.size),
             ext: path.extname(dirent.name).toLowerCase()
           };
         } catch {
@@ -72,6 +96,7 @@ async function scanDirectory(dirPath) {
       return a.type === 'folder' ? -1 : 1;
     });
     node.size = node.children.reduce((acc, c) => acc + (c.size || 0), 0);
+    node.lines = node.children.reduce((acc, c) => acc + (c.lines || 0), 0);
   } catch (err) {
     console.error(`Erro em: ${dirPath}`, err.message);
   }

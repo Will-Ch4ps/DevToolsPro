@@ -1,0 +1,179 @@
+/* Modal SSH — abas, seções e listas (hosts/chaves) */
+
+/* === SSH MODAL === */
+
+.modal-ssh-window {
+    width: 600px;
+    height: auto;
+    max-height: 85vh;
+}
+
+.ssh-modal-body {
+    padding: 0;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ssh-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-hover);
+}
+
+.ssh-tab {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.ssh-tab:hover {
+    color: var(--text-main);
+    background: var(--bg-card);
+}
+
+.ssh-tab.active {
+    color: var(--accent);
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--accent);
+}
+
+.ssh-tab-content {
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.ssh-tab-content.active {
+    display: flex;
+}
+
+/* === SSH SECTIONS === */
+
+.ssh-section {
+    background: var(--bg-root);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--bg-hover);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.section-header span:last-of-type {
+    flex: 1;
+}
+
+/* === SSH LISTS === */
+
+.ssh-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ssh-list-small {
+    max-height: 120px;
+}
+
+.ssh-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    transition: 0.15s;
+}
+
+.ssh-list-item:last-child {
+    border-bottom: none;
+}
+
+.ssh-list-item:hover {
+    background: var(--bg-hover);
+}
+
+.ssh-list-item.clickable {
+    cursor: pointer;
+}
+
+.ssh-list-item-small {
+    padding: 8px 12px;
+}
+
+.item-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-hover);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-title {
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.item-badge {
+    font-size: 14px;
+}
+
+.item-type {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg-hover);
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+.list-placeholder {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.list-placeholder.error {
+    color: var(--danger);
+}

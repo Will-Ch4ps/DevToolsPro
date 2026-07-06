@@ -10,6 +10,10 @@ export const Router = {
         this.container.style.position = 'relative';
         this.container.style.height = '100%';
         this.container.style.overflow = 'hidden';
+
+        // Remove o placeholder inicial ("Inicializando módulos...") para não
+        // ficar preso atrás/acima das telas depois que uma view monta.
+        this.container.querySelectorAll(':scope > .empty-state').forEach(el => el.remove());
     },
     
     // Registra uma nova rota

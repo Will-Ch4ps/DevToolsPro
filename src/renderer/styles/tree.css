@@ -1,0 +1,150 @@
+/* Árvore de arquivos — linhas, métricas e estados (vazio/carregando) */
+
+/* === FILE TREE === */
+
+.file-tree-container {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 0;
+}
+
+.tree-row {
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.tree-row:hover {
+    background: #1f242c;
+    color: var(--text-main);
+}
+
+/* Linha selecionada em destaque (marcação visível na própria árvore) */
+.tree-row:has(> .tree-checkbox:checked) {
+    background: rgba(var(--success-rgb), 0.10);
+    box-shadow: inset 3px 0 0 var(--success);
+    color: var(--text-main);
+}
+.tree-row:has(> .tree-checkbox:checked):hover {
+    background: rgba(var(--success-rgb), 0.16);
+}
+
+.tree-checkbox {
+    margin-right: 4px;
+    accent-color: var(--accent);
+}
+
+.folder-icon {
+    color: var(--warning);
+    font-size: 18px;
+}
+
+.folder-name {
+    font-weight: 600;
+}
+
+/* Filhos da pasta começam recolhidos (o clique na linha alterna) */
+.tree-children {
+    display: none;
+}
+
+.file-icon {
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-size {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    opacity: 0.5;
+}
+
+/* Metadados à direita da linha do arquivo (métrica principal + secundária) */
+.file-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.file-metric {
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Métrica em destaque: legível, com bolinha de "peso" em cor suave */
+.file-metric.primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #adbac7;
+}
+.file-metric.primary .metric-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.85;
+    flex-shrink: 0;
+}
+.file-metric.primary.weight-low  { color: #8b98a5; }              /* neutro, sem alarme */
+.file-metric.primary.weight-mid  { color: #d0a45c; }              /* âmbar suave */
+.file-metric.primary.weight-high { color: #e0836f; }              /* vermelho suave */
+.file-metric.primary.weight-none { color: var(--text-muted); }
+
+/* Métrica agregada por pasta (discreta, alinhada à direita) */
+.folder-meta {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+/* === EMPTY & LOADING STATES === */
+
+.empty-state-icon {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    gap: 10px;
+}
+
+.empty-state-icon span {
+    font-size: 64px;
+}
+
+.loading-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: var(--text-muted);
+}
+
+.loading-state span {
+    font-size: 48px;
+    color: var(--accent);
+}

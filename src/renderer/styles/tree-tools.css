@@ -1,0 +1,116 @@
+/* Barra de ferramentas da árvore — ordenar, exibir e selecionar */
+
+/* === Barra de ferramentas da árvore (ordenar / exibir / selecionar) === */
+
+.tree-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background: var(--bg-input, #0d1117);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.tt-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tt-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.tt-select {
+    background: var(--bg-input, #0d1117);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    font-size: 12px;
+    padding: 5px 8px;
+    outline: none;
+    cursor: pointer;
+}
+
+.tt-input {
+    width: 58px;
+    background: var(--bg-input, #0d1117);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    font-size: 12px;
+    padding: 5px 8px;
+    outline: none;
+}
+.tt-input:focus { border-color: var(--text-muted); }
+
+.tt-sep { color: var(--text-muted); }
+
+.tt-unit {
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 18px;
+}
+
+.tt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.tt-btn:hover { border-color: var(--text-muted); color: var(--text-main); }
+.tt-btn .material-icons-round { font-size: 16px; }
+.tt-btn-primary {
+    border-color: transparent;
+    background: rgba(var(--accent-rgb), 0.12);
+    color: var(--accent);
+}
+.tt-btn-primary:hover { background: rgba(var(--accent-rgb), 0.2); color: var(--accent); }
+
+/* Segmentado (Linhas | Tamanho) */
+.tt-seg {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.tt-seg-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 5px 12px;
+    cursor: pointer;
+}
+.tt-seg-btn:not(:last-child) { border-right: 1px solid var(--border); }
+.tt-seg-btn.active {
+    background: rgba(var(--accent-rgb), 0.14);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Empurra o "Só selecionados" para a direita */
+.tt-spacer { flex: 1 1 auto; }
+
+/* Botão "Só selecionados" */
+.tt-selected:disabled { opacity: 0.4; cursor: default; }
+.tt-selected.active {
+    border-color: transparent;
+    background: rgba(var(--success-rgb), 0.16);
+    color: #3fb950;
+}
+.tt-selected.active:hover { background: rgba(var(--success-rgb), 0.24); color: #3fb950; }

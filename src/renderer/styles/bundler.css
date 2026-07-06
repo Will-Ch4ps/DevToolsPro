@@ -1,0 +1,204 @@
+/* Bundler — filtros, accordion, status e dropdown */
+
+/* === BUNDLER LAYOUT === */
+
+.bundler-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-height));
+    padding: 15px 20px;
+    gap: 15px;
+    overflow: hidden;
+}
+
+/* === FILTER BAR === */
+
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.filter-chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 5px 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 12px;
+}
+
+.filter-chip:hover {
+    border-color: var(--text-muted);
+    color: var(--text-main);
+}
+
+.filter-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.filter-chip-danger {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+.filter-chip-danger:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* === ACCORDION === */
+
+.accordion-section {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    flex-shrink: 0;
+}
+
+.accordion-header {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-hover);
+    user-select: none;
+    font-size: 13px;
+}
+
+.accordion-arrow {
+    margin-left: auto;
+}
+
+.accordion-content {
+    display: none;
+    background: var(--bg-root);
+    border-top: 1px solid var(--border);
+    padding: 15px;
+}
+
+.accordion-content.open {
+    display: flex;
+    gap: 20px;
+    height: 250px;
+}
+
+/* === STATUS PANEL === */
+
+.status-panel {
+    background: var(--bg-card);
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    flex-shrink: 0;
+}
+
+.status-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.status-info b {
+    color: var(--text-main);
+}
+
+.token-bar-container {
+    height: 6px;
+    background: var(--bg-root);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.token-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--success);
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.btn-generate {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    margin-top: 10px;
+    background: var(--success);
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: var(--radius);
+    font-size: 14px;
+}
+
+.btn-generate:hover {
+    background: #2ea043;
+}
+
+.btn-generate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* === DROPDOWN === */
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    min-width: 200px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: 0.15s;
+    font-size: 13px;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-hover);
+}
