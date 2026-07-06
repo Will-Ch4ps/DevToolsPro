@@ -34,11 +34,25 @@ export function toggleNode(node, checked) {
       state.selectedPaths.delete(node.path);
       state.totalSize -= node.size;
     }
+    // Desmarcar sempre limpa a marca de "puxado por dependência"
+    if (!checked) setDerived(node, false);
   }
 
   if (node.children) {
     node.children.forEach(child => toggleNode(child, checked));
   }
+}
+
+/**
+ * Marca/desmarca um arquivo como "puxado por dependência" (visual roxo),
+ * pra distinguir do que o usuário selecionou diretamente (verde).
+ */
+export function setDerived(node, on) {
+  if (!node || node.type !== 'file') return;
+  node._derived = on;
+  if (node._elRow) node._elRow.classList.toggle('is-derived', on);
+  if (on) state.derivedPaths.add(node.path);
+  else state.derivedPaths.delete(node.path);
 }
 
 export function handleFilter(types) {
@@ -85,5 +99,5 @@ function applyFilter(node, allowedExts) {
 
 export function updateStats() {
   // Diretórios vazios não entram na estimativa de tokens (tamanho 0)
-  BundlerView.updateStats(state.selectedPaths.size, state.totalSize);
+  BundlerView.updateStats(state.selectedPaths.size, state.totalSize, state.derivedPaths.size);
 }

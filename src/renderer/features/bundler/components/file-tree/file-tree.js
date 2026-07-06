@@ -15,9 +15,11 @@ import { buildNode, setDisplayMetric } from './tree-node-builder.js';
 export const FileTree = {
   container: null,
   onCheckCallback: null,
+  onInspectCallback: null,
   contentEl: null,
   data: null,
   selectedOnly: false,
+  _neighborRows: [],
 
   /**
    * Inicializa o componente
@@ -59,7 +61,7 @@ export const FileTree = {
     setState(this, 'content');
 
     data.children.forEach((node) => {
-      this.contentEl.appendChild(buildNode(node, 0, this.onCheckCallback));
+      this.contentEl.appendChild(buildNode(node, 0, this.onCheckCallback, this.onInspectCallback));
     });
 
     // Reaplica o filtro "só selecionados" se estiver ativo (o DOM foi reconstruído)
@@ -145,5 +147,48 @@ export const FileTree = {
       return has;
     };
     (this.data.children || []).forEach(walk);
+  },
+
+  /**
+   * Destaca na árvore os vizinhos (ligados) e, distinto deles, o arquivo EM FOCO
+   * (o que foi inspecionado) — pra a seleção inicial não se perder no meio.
+   */
+  highlightNeighbors(paths, focusPath) {
+    this.clearNeighbors();
+    if (!this.data) return;
+
+    const set = new Set(paths || []);
+    const walk = (n, ancestors) => {
+      if (n.type === 'file' && n._elRow) {
+        if (focusPath && n.path === focusPath) {
+          n._elRow.classList.add('is-focus');
+          this._neighborRows.push(n._elRow);
+          ancestors.forEach(a => this._expandFolder(a));
+          const row = n._elRow;
+          setTimeout(() => row.scrollIntoView({ block: 'center' }), 0);
+        } else if (set.has(n.path)) {
+          n._elRow.classList.add('is-neighbor');
+          this._neighborRows.push(n._elRow);
+        }
+      }
+      const nextAnc = n.type === 'folder' ? [...ancestors, n] : ancestors;
+      (n.children || []).forEach(ch => walk(ch, nextAnc));
+    };
+    (this.data.children || []).forEach(ch => walk(ch, []));
+  },
+
+  _expandFolder(folderNode) {
+    if (!folderNode._elChildren) return;
+    folderNode._elChildren.style.display = 'block';
+    const icon = folderNode._elRow?.querySelector('.folder-icon');
+    if (icon) { icon.textContent = 'folder_open'; icon.style.color = '#e3b341'; }
+  },
+
+  clearNeighbors() {
+    this._neighborRows.forEach(r => {
+      r.classList.remove('is-neighbor');
+      r.classList.remove('is-focus');
+    });
+    this._neighborRows = [];
   }
 };

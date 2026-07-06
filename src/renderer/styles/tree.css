@@ -37,6 +37,44 @@
     background: rgba(var(--success-rgb), 0.16);
 }
 
+/* Arquivo PUXADO por dependência (não escolha direta): roxo, distinto do verde */
+.tree-row.is-derived:has(> .tree-checkbox:checked) {
+    background: rgba(163, 113, 247, 0.14);
+    box-shadow: inset 3px 0 0 #a371f7;
+}
+.tree-row.is-derived:has(> .tree-checkbox:checked):hover {
+    background: rgba(163, 113, 247, 0.22);
+}
+.tree-row.is-derived .file-name { color: #d2b8ff; }
+
+/* Vizinhos (ligados) do arquivo em foco no inspetor */
+.tree-row.is-neighbor { background: rgba(var(--accent-rgb), 0.12); }
+.tree-row.is-neighbor .file-name { color: var(--accent); }
+
+/* Arquivo EM FOCO (o inspecionado) — bem distinto dos vizinhos */
+.tree-row.is-focus {
+    background: rgba(var(--accent-rgb), 0.28);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+.tree-row.is-focus .file-name { color: #cfe4ff; font-weight: 700; }
+.tree-row.is-focus .file-icon { color: var(--accent); opacity: 1; }
+
+/* Botão de inspeção (aparece ao passar o mouse na linha) */
+.file-inspect {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    opacity: 0;
+    padding: 0 2px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+.tree-row:hover .file-inspect { opacity: 0.6; }
+.file-inspect:hover { opacity: 1; color: var(--accent); }
+.file-inspect .material-icons-round { font-size: 15px; }
+
 .tree-checkbox {
     margin-right: 4px;
     accent-color: var(--accent);

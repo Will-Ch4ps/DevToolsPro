@@ -16,7 +16,7 @@ export const StatusPanel = {
 
         containerEl.innerHTML = `
             <div class="status-info">
-                <span>Selecionado: <b id="lbl-files">0</b> arquivos</span>
+                <span>Selecionado: <b id="lbl-files">0</b> arquivos<span id="lbl-derived" class="lbl-derived"></span></span>
                 <span>Est. Tokens: <b id="lbl-tokens">0</b></span>
             </div>
 
@@ -54,6 +54,7 @@ export const StatusPanel = {
 
         this.elements = {
             lblFiles: containerEl.querySelector('#lbl-files'),
+            lblDerived: containerEl.querySelector('#lbl-derived'),
             lblTokens: containerEl.querySelector('#lbl-tokens'),
             tokenBar: containerEl.querySelector('#token-bar'),
             btnGenerate: containerEl.querySelector('#btn-generate'),
@@ -75,11 +76,14 @@ export const StatusPanel = {
     /**
      * Atualiza estatísticas
      */
-    updateStats(fileCount, totalSize) {
+    updateStats(fileCount, totalSize, derivedCount = 0) {
         const tokens = Math.ceil(totalSize / 3.5);
         const pct = Math.min((tokens / 128000) * 100, 100);
 
         this.elements.lblFiles.textContent = fileCount;
+        if (this.elements.lblDerived) {
+            this.elements.lblDerived.textContent = derivedCount > 0 ? ` · ${derivedCount} puxados` : '';
+        }
         this.elements.lblTokens.textContent = `${(tokens / 1000).toFixed(1)}k`;
         this.elements.tokenBar.style.width = `${pct}%`;
 

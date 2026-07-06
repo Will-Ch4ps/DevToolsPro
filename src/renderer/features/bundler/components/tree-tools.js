@@ -1,11 +1,12 @@
 // dev-tools-hub-pro/src/renderer/features/bundler/components/tree-tools.js
 
 import { DepsMenu } from './deps-menu.js';
+import { AnalysisMenu } from './analysis-menu.js';
 
 /**
  * Barra de ferramentas da árvore.
  * Uma métrica única (linhas OU tamanho) guia tudo: exibição, ordenação e seleção.
- * Ordem: Ordenar → Exibir → Selecionar → Ligações → (Só selecionados).
+ * Ordem: Ordenar → Exibir → Selecionar → Ligações → Análise → (Só selecionados).
  */
 export const TreeTools = {
   container: null,
@@ -53,6 +54,7 @@ export const TreeTools = {
       </div>
 
       <div id="tt-deps-slot"></div>
+      <div id="tt-analysis-slot"></div>
 
       <div class="tt-spacer"></div>
 
@@ -65,6 +67,11 @@ export const TreeTools = {
     DepsMenu.render(containerEl.querySelector('#tt-deps-slot'), {
       onPreview: (opts) => this.callbacks.onDepsPreview?.(opts),
       onApply: (opts) => this.callbacks.onDepsApply?.(opts)
+    });
+
+    AnalysisMenu.render(containerEl.querySelector('#tt-analysis-slot'), {
+      onAnalyze: () => this.callbacks.onAnalyze?.(),
+      onSelect: (paths) => this.callbacks.onSelectPaths?.(paths)
     });
 
     this._bind();

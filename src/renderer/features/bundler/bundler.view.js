@@ -1,6 +1,6 @@
 // dev-tools-hub-pro/src/renderer/features/bundler/bundler.view.js
 
-import { FileTree, FilterBar, TreeTools, StatusPanel, SshModal } from './components/index.js';
+import { FileTree, FilterBar, TreeTools, StatusPanel, SshModal, FileInspector } from './components/index.js';
 import { getBundlerTemplate } from './bundler.view.template.js';
 import * as PromptsPanel from './bundler.view.prompts.js';
 import * as HeaderPanel from './bundler.view.header.js';
@@ -59,6 +59,8 @@ export const BundlerView = {
       this.elements.container.querySelector('#file-tree'),
       (node, checked) => this.events.onCheck?.(node, checked)
     );
+    FileTree.onInspectCallback = (filePath, rect) => this.events.onInspect?.(filePath, rect);
+    FileInspector.init();
 
     FilterBar.render(
       this.elements.container.querySelector('#filter-bar'),
@@ -73,6 +75,8 @@ export const BundlerView = {
         onSelectByMetric: (opts) => this.events.onSelectByMetric?.(opts),
         onDepsPreview: (opts) => this.events.onDepsPreview?.(opts),
         onDepsApply: (opts) => this.events.onDepsApply?.(opts),
+        onAnalyze: () => this.events.onAnalyze?.(),
+        onSelectPaths: (paths) => this.events.onSelectPaths?.(paths),
         onShowSelectedOnly: (on) => this.events.onShowSelectedOnly?.(on)
       }
     );
@@ -152,8 +156,8 @@ export const BundlerView = {
     FileTree.setDisplayMetric(metric);
   },
 
-  updateStats(count, size) {
-    StatusPanel.updateStats(count, size);
+  updateStats(count, size, derived = 0) {
+    StatusPanel.updateStats(count, size, derived);
     TreeTools.setSelectedCount(count);
   },
 
@@ -163,6 +167,17 @@ export const BundlerView = {
 
   showSelectedOnly(on) {
     FileTree.applySelectedOnly(on);
+  },
+
+  openInspector({ filePath, uses, usedBy, rect }) {
+    FileInspector.open(
+      { filePath, uses, usedBy, rect },
+      {
+        onSelect: (paths) => this.events.onSelectPaths?.(paths),
+        onClose: () => FileTree.clearNeighbors()
+      }
+    );
+    FileTree.highlightNeighbors([...(uses || []), ...(usedBy || [])], filePath);
   },
 
   setGenerating(loading) {

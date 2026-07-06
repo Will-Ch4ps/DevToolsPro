@@ -2,78 +2,122 @@
 
 const fs = require('fs/promises');
 const path = require('path');
+
 const {
-  RESOLVE_EXTS,
-  INDEX_FILES,
   langForExt,
   extractSpecifiers,
   normalizeSpecifier
 } = require('./extractors.js');
 
-/**
- * Motor de dependências (determinístico, sem IA).
- * Lê os arquivos, extrai os imports, resolve cada um para um arquivo do projeto
- * e devolve um grafo de arestas "quem importa quem".
- *
- * As arestas usam os MESMOS caminhos absolutos que a árvore/seleção do renderer,
- * então o front consegue mapear direto para os nós selecionados.
- */
+const { computeAnalysis } = require('./analysis.js');
+const { buildFileMaps, slash, uniq } = require('./utils.js');
+const { buildPackageIndex } = require('./package-index.js');
+const { buildTsAliases, buildCommonAliases, buildNameAliases } = require('./aliases.js');
+const { resolveSpecifier } = require('./resolver.js');
+const { applyHints } = require('./hints.js');
 
-// Forma canônica p/ comparar caminhos no Windows (separadores + caixa).
-const norm = (p) => p.replace(/\\/g, '/').toLowerCase();
+async function buildContext(root, files) {
+  const { byNorm, byDir, byBase } = buildFileMaps(files);
+  const { packageByName, packageByDir } = await buildPackageIndex(files);
+  const tsAliases = await buildTsAliases(root, files);
+  const commonAliases = buildCommonAliases(root, files);
+  const nameAliases = buildNameAliases(root, files);
 
-function resolveSpecifier(relPath, importerAbs, lang, byNorm) {
-  const baseDir = path.dirname(importerAbs);
-  const candidateBase = path.resolve(baseDir, relPath);
+  return {
+    root,
+    byNorm,
+    byDir,
+    byBase,
+    packageByName,
+    packageByDir,
+    tsAliases,
+    commonAliases,
+    nameAliases
+  };
+}
 
-  const tries = [candidateBase];
-  for (const ext of (RESOLVE_EXTS[lang] || [])) tries.push(candidateBase + ext);
-  for (const idx of (INDEX_FILES[lang] || [])) tries.push(path.join(candidateBase, idx));
+async function parseFile(file, ctx) {
+  const lang = langForExt(path.extname(file).toLowerCase());
+  if (!lang) return null;
 
-  for (const t of tries) {
-    const hit = byNorm.get(norm(t));
-    if (hit) return hit;
+  let content;
+
+  try {
+    content = await fs.readFile(file, 'utf8');
+  } catch {
+    return null;
   }
-  return null;
+
+  if (content.includes('\0')) return null;
+
+  const targets = new Set();
+
+  for (const raw of extractSpecifiers(content, lang)) {
+    const spec = normalizeSpecifier(raw, lang);
+    if (!spec) continue;
+
+    const resolved = resolveSpecifier(spec, file, lang, ctx);
+    if (resolved && resolved !== file) targets.add(resolved);
+  }
+
+  return {
+    parsed: true,
+    targets: [...targets]
+  };
 }
 
 async function buildGraph({ root, files }) {
   try {
     const list = Array.isArray(files) ? files : [];
-    const byNorm = new Map();
-    for (const f of list) byNorm.set(norm(f), f);
+    const ctx = await buildContext(root, list);
 
     const edges = {};
     let parsed = 0;
-    let edgeCount = 0;
 
     await Promise.all(list.map(async (file) => {
-      const lang = langForExt(path.extname(file).toLowerCase());
-      if (!lang) return;
-
-      let content;
-      try { content = await fs.readFile(file, 'utf8'); } catch { return; }
-      if (content.includes('\0')) return; // binário
+      const result = await parseFile(file, ctx);
+      if (!result) return;
 
       parsed++;
 
-      const targets = new Set();
-      for (const spec of extractSpecifiers(content, lang)) {
-        const rel = normalizeSpecifier(spec, lang);
-        if (!rel) continue;
-        const resolved = resolveSpecifier(rel, file, lang, byNorm);
-        if (resolved && resolved !== file) targets.add(resolved);
-      }
-
-      if (targets.size) {
-        edges[file] = [...targets];
-        edgeCount += targets.size;
+      if (result.targets.length) {
+        edges[file] = result.targets;
       }
     }));
 
-    return { success: true, edges, stats: { files: list.length, parsed, edges: edgeCount } };
+    applyHints(list, edges, ctx);
+
+    let edgeCount = 0;
+
+    for (const from in edges) {
+      edges[from] = uniq(edges[from])
+        .filter(to => to && to !== from)
+        .sort((a, b) => slash(a).localeCompare(slash(b)));
+
+      edgeCount += edges[from].length;
+    }
+
+    const analysis = computeAnalysis(list, edges);
+
+    return {
+      success: true,
+      edges,
+      analysis,
+      stats: {
+        files: list.length,
+        parsed,
+        edges: edgeCount,
+        packages: ctx.packageByName.size,
+        tsAliases: ctx.tsAliases.length,
+        commonAliases: ctx.commonAliases.length,
+        nameAliases: ctx.nameAliases.length
+      }
+    };
   } catch (e) {
-    return { success: false, error: e.message };
+    return {
+      success: false,
+      error: e.message
+    };
   }
 }
 

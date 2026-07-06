@@ -7,6 +7,7 @@ export const state = {
   rootPath: null,
   structure: null,
   selectedPaths: new Set(),        // arquivos
+  derivedPaths: new Set(),         // arquivos puxados por dependência (não escolha direta)
   selectedEmptyDirs: new Set(),    // diretórios vazios (apenas local/WSL)
   totalSize: 0,
   promptsCache: [],

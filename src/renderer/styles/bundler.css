@@ -111,6 +111,12 @@
     color: var(--text-main);
 }
 
+/* Contagem de arquivos puxados por dependência (mesmo roxo da árvore) */
+.lbl-derived {
+    color: #a371f7;
+    font-weight: 600;
+}
+
 .token-bar-container {
     height: 6px;
     background: var(--bg-root);

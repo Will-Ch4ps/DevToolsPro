@@ -36,6 +36,7 @@ export async function handleOpenWsl(distroName) {
 export async function loadProject(projectPath) {
   state.rootPath = projectPath;
   state.selectedPaths.clear();
+  state.derivedPaths.clear();
   state.selectedEmptyDirs.clear();
   state.totalSize = 0;
   GraphService.invalidate(); // grafo é reconstruído sob demanda no novo projeto
@@ -86,6 +87,7 @@ export async function handleRefresh() {
 
     // Reaplica seleção
     state.selectedPaths.clear();
+    state.derivedPaths.clear();
     state.selectedEmptyDirs.clear();
     state.totalSize = 0;
 

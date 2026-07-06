@@ -2,13 +2,7 @@
 
 const { ipcRenderer } = require('electron');
 
-/**
- * Serviço do grafo de dependências no renderer.
- * Carrega o grafo (via IPC/motor no main) e faz travessia transitiva.
- * As chaves/arestas usam os mesmos caminhos absolutos da árvore, então dá
- * pra mapear direto para os nós selecionados.
- */
-let cache = { root: null, adj: null, radj: null, stats: null };
+let cache = { root: null, adj: null, radj: null, stats: null, analysis: null };
 
 export const GraphService = {
   async ensureLoaded(root, files) {
@@ -18,29 +12,46 @@ export const GraphService = {
     if (!res || !res.success) return { ok: false, error: res && res.error };
 
     const adj = res.edges || {};
-    cache = { root, adj, radj: reverse(adj), stats: res.stats };
+    cache = {
+      root,
+      adj,
+      radj: reverse(adj),
+      stats: res.stats,
+      analysis: res.analysis || null
+    };
+
     return { ok: true, stats: res.stats };
   },
 
   invalidate() {
-    cache = { root: null, adj: null, radj: null, stats: null };
+    cache = { root: null, adj: null, radj: null, stats: null, analysis: null };
   },
 
-  /**
-   * Expande a partir de seeds respeitando direção e alcance.
-   * direction: 'deps' (o que importa) | 'dependents' (quem importa) | 'both'
-   * depth: número de níveis (1 = vizinhos diretos) ou Infinity (transitivo)
-   * Retorna um Set com os seeds + os alcançados.
-   */
+  analyze() {
+    return cache.analysis;
+  },
+
+  directNeighbors(filePath, direction = 'deps') {
+    const fwd = cache.adj?.[filePath] || [];
+    const back = cache.radj?.[filePath] || [];
+
+    if (direction === 'dependents') return back.slice();
+    if (direction === 'both') return [...new Set([...fwd, ...back])];
+
+    return fwd.slice();
+  },
+
   expand(seeds, { direction = 'deps', depth = Infinity } = {}) {
     const wantFwd = direction === 'deps' || direction === 'both';
     const wantBack = direction === 'dependents' || direction === 'both';
 
     const neighbors = (node) => {
-      let out = [];
-      if (wantFwd && cache.adj) out = out.concat(cache.adj[node] || []);
-      if (wantBack && cache.radj) out = out.concat(cache.radj[node] || []);
-      return out;
+      const out = [];
+
+      if (wantFwd) out.push(...(cache.adj?.[node] || []));
+      if (wantBack) out.push(...(cache.radj?.[node] || []));
+
+      return [...new Set(out)];
     };
 
     const result = new Set(seeds);
@@ -49,24 +60,37 @@ export const GraphService = {
 
     while (frontier.length && level < depth) {
       const next = [];
+
       for (const node of frontier) {
         for (const n of neighbors(node)) {
-          if (!result.has(n)) { result.add(n); next.push(n); }
+          if (!result.has(n)) {
+            result.add(n);
+            next.push(n);
+          }
         }
       }
+
       frontier = next;
       level++;
     }
+
     return result;
   }
 };
 
 function reverse(adj) {
   const r = {};
+
   for (const from in adj) {
-    for (const to of adj[from]) {
-      (r[to] = r[to] || []).push(from);
+    for (const to of adj[from] || []) {
+      if (!r[to]) r[to] = [];
+      r[to].push(from);
     }
   }
+
+  for (const k in r) {
+    r[k] = [...new Set(r[k])];
+  }
+
   return r;
 }

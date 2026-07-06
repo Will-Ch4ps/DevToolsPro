@@ -17,7 +17,7 @@ const THRESHOLDS = {
   size: { mid: 20 * 1024, high: 75 * 1024 }
 };
 
-export function buildNode(node, level, onCheck) {
+export function buildNode(node, level, onCheck, onInspect) {
   const row = document.createElement('div');
   row.className = 'tree-row';
   row.style.paddingLeft = `${level * 20 + 10}px`;
@@ -33,12 +33,12 @@ export function buildNode(node, level, onCheck) {
   };
 
   if (node.type === 'folder') {
-    return buildFolderNode(node, row, checkbox, level, onCheck);
+    return buildFolderNode(node, row, checkbox, level, onCheck, onInspect);
   }
-  return buildFileNode(node, row, checkbox);
+  return buildFileNode(node, row, checkbox, onInspect);
 }
 
-function buildFolderNode(node, row, checkbox, level, onCheck) {
+function buildFolderNode(node, row, checkbox, level, onCheck, onInspect) {
   const val = metricValue(node, DISPLAY_METRIC);
   const folderMeta = (val == null || val === 0)
     ? ''
@@ -80,25 +80,35 @@ function buildFolderNode(node, row, checkbox, level, onCheck) {
 
   if (Array.isArray(node.children) && node.children.length > 0) {
     node.children.forEach((child) => {
-      childrenDiv.appendChild(buildNode(child, level + 1, onCheck));
+      childrenDiv.appendChild(buildNode(child, level + 1, onCheck, onInspect));
     });
   }
 
   return wrapper;
 }
 
-function buildFileNode(node, row, checkbox) {
+function buildFileNode(node, row, checkbox, onInspect) {
   row.innerHTML = `
         <span class="material-icons-round file-icon">description</span>
         <span class="file-name">${escapeHtml(node.name)}</span>
+        <button class="file-inspect" title="Ver ligações deste arquivo">
+          <span class="material-icons-round">hub</span>
+        </button>
         <span class="file-meta">${renderMetric(node, DISPLAY_METRIC)}</span>
       `;
   row.prepend(checkbox);
   node._elRow = row;
+  if (node._derived) row.classList.add('is-derived'); // preserva marca ao re-renderizar
 
-  // Clicar na linha marca o checkbox
+  const inspectBtn = row.querySelector('.file-inspect');
+  inspectBtn.onclick = (e) => {
+    e.stopPropagation();
+    onInspect?.(node.path, inspectBtn.getBoundingClientRect());
+  };
+
+  // Clicar na linha marca o checkbox (menos no botão de inspeção)
   row.onclick = (e) => {
-    if (e.target !== checkbox) checkbox.click();
+    if (e.target !== checkbox && !inspectBtn.contains(e.target)) checkbox.click();
   };
 
   return row;
