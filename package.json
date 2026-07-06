@@ -1,0 +1,39 @@
+{
+  "name": "dev-tools-hub-pro",
+  "version": "2.0.0",
+  "description": "Ferramenta de desenvolvimento para gerenciamento de código-fonte e prompts",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start:linux": "ELECTRON_NO_SANDBOX=true ELECTRON_NO_ATTACH_CONSOLE=true electron .",
+    "start": "electron .",
+    "dev:linux": "ELECTRON_NO_SANDBOX=true ELECTRON_NO_ATTACH_CONSOLE=true electron . --dev",
+    "dev": "electron . --dev",
+    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder build"
+  },
+  "dependencies": {
+    "ssh2": "^1.17.0"
+  },
+  "devDependencies": {
+    "electron": "30.0.0",
+    "electron-builder": "24.6.4"
+  },
+  "build": {
+    "appId": "com.devtools.hub.pro",
+    "productName": "Dev Tools Hub Pro",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "data/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
