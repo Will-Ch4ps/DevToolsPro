@@ -1,9 +1,11 @@
 // dev-tools-hub-pro/src/renderer/features/bundler/components/tree-tools.js
 
+import { DepsMenu } from './deps-menu.js';
+
 /**
  * Barra de ferramentas da árvore.
  * Uma métrica única (linhas OU tamanho) guia tudo: exibição, ordenação e seleção.
- * Ordem: Ordenar → Exibir → Selecionar → (Só selecionados).
+ * Ordem: Ordenar → Exibir → Selecionar → Ligações → (Só selecionados).
  */
 export const TreeTools = {
   container: null,
@@ -50,6 +52,8 @@ export const TreeTools = {
         <button id="tt-apply" class="tt-btn tt-btn-primary">Selecionar</button>
       </div>
 
+      <div id="tt-deps-slot"></div>
+
       <div class="tt-spacer"></div>
 
       <button id="tt-selected" class="tt-btn tt-selected" disabled title="Mostrar só os arquivos selecionados">
@@ -57,6 +61,11 @@ export const TreeTools = {
         <span id="tt-selected-lbl">Só selecionados (0)</span>
       </button>
     `;
+
+    DepsMenu.render(containerEl.querySelector('#tt-deps-slot'), {
+      onPreview: (opts) => this.callbacks.onDepsPreview?.(opts),
+      onApply: (opts) => this.callbacks.onDepsApply?.(opts)
+    });
 
     this._bind();
   },

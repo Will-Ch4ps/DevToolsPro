@@ -5,6 +5,7 @@ import { BundlerView } from '../bundler.view.js';
 import { SshService } from '../services/index.js';
 import { collectFilePaths, findNodeByPath, folderHasAnyFile } from '../lib/tree-utils.js';
 import { handleCheck, toggleNode, updateStats } from './selection.handlers.js';
+import { GraphService } from '../graph/index.js';
 
 const { ipcRenderer } = require('electron');
 
@@ -37,6 +38,7 @@ export async function loadProject(projectPath) {
   state.selectedPaths.clear();
   state.selectedEmptyDirs.clear();
   state.totalSize = 0;
+  GraphService.invalidate(); // grafo é reconstruído sob demanda no novo projeto
 
   BundlerView.showTreeLoading(true);
   BundlerView.updatePathDisplay(projectPath, state.isRemoteMode);
@@ -60,6 +62,7 @@ export async function handleRefresh() {
   const prevSelectedFiles = new Set(state.selectedPaths);
   const prevSelectedEmptyDirs = new Set(state.selectedEmptyDirs);
 
+  GraphService.invalidate(); // arquivos podem ter mudado; refaz o grafo sob demanda
   BundlerView.showTreeLoading(true);
 
   try {

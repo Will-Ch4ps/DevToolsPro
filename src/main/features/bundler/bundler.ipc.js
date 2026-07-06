@@ -5,6 +5,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
+const { buildGraph } = require('./graph');
 
 // --- CONFIGURAÇÃO DE SEGURANÇA ---
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -221,6 +222,9 @@ exports.init = (win) => {
   });
 
   ipcMain.handle('bundler:scan', async (_, p) => await scanDirectory(p));
+
+  // Grafo de dependências (import/require/from) dos arquivos locais informados.
+  ipcMain.handle('bundler:graph', async (_, { root, files }) => await buildGraph({ root, files }));
 
   /**
    * ✅ Suporta:

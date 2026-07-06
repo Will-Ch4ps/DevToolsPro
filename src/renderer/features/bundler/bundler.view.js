@@ -71,6 +71,8 @@ export const BundlerView = {
         onSort: (mode, dir) => this.events.onSort?.(mode, dir),
         onDisplayMetric: (metric) => this.events.onDisplayMetric?.(metric),
         onSelectByMetric: (opts) => this.events.onSelectByMetric?.(opts),
+        onDepsPreview: (opts) => this.events.onDepsPreview?.(opts),
+        onDepsApply: (opts) => this.events.onDepsApply?.(opts),
         onShowSelectedOnly: (on) => this.events.onShowSelectedOnly?.(on)
       }
     );
